@@ -1,0 +1,59 @@
+name: CT Algolia Daily Price Sync Lambda
+
+on:
+  push:
+    branches:
+      - develop
+      - uat
+      - prod
+    tags:
+      - 'uat-*'  # Only triggers on tags with prefix 'uat-'
+
+  pull_request:
+    branches:
+      - develop
+      - uat
+      - prod
+    paths:
+      - external/scripts/commercetools-algolia-daily-price-sync-aws-lambda/**
+      - .github/**
+
+jobs:
+  build-and-deploy:
+    # Run only if the tag starts with 'uat-'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/uat-')
+    environment: uat
+
+    runs-on: ubuntu-latest
+
+    env:
+      lambda_dir: external/scripts/commercetools-algolia-daily-price-sync-aws-lambda
+      function_name: commercetools-algolia-daily-price-sync
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+
+      - name: Build the Lambda function
+        run: |
+          cd ${{ env.lambda_dir }}
+          echo "Building function ${{ env.function_name }}"
+          yarn install
+          yarn build
+          cd build
+          zip -r deployment_package.zip .
+
+      - name: Deploy to AWS Lambda (UAT)
+        uses: appleboy/lambda-action@v0.2.0
+        with:
+          aws_region: ${{ env.AWS_REGION }}
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          function_name: "uat-${{ env.function_name }}"
+          zip_file: ${{ env.lambda_dir }}/build/deployment_package.zip

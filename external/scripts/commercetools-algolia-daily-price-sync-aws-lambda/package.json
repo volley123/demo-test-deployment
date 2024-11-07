@@ -1,0 +1,14 @@
+{
+    "name": "commercetools-algolia-daily-price-sync",
+    "version": "1.0.0",
+    "description": "A POC Lambda function for CT Algolia sync",
+    "main": "src/index.js",
+    "scripts": {
+      "build": "echo 'Building project...'", 
+      "test": "echo 'No tests specified' && exit 0"
+    },
+    "author": "Varshil Desai",
+    "license": "ISC",
+    "dependencies": {}
+  }
+  
