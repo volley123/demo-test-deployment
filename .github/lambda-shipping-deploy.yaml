@@ -8,7 +8,7 @@ on:
       - prod
     paths:
       - external/scripts/commercetools-shipping-lambda/**
-      - .github/**
+      - .github/** 
 
   pull_request:
     branches:
