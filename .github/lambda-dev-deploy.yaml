@@ -3,7 +3,7 @@ name: CT Algolia Daily Price Sync Lambda
 on:
   push:
     branches:
-      - develop
+      - dev
       - uat
       - prod
     tags:
@@ -11,7 +11,7 @@ on:
 
   pull_request:
     branches:
-      - develop
+      - dev
       - uat
       - prod
     paths:
