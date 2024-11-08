@@ -15,6 +15,7 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
         statusCode: 200,
         body: JSON.stringify({
             message: responseMessage, // New message indicating the version
+            
             event: event,
         }),
     };
