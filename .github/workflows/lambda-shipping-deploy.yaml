@@ -28,7 +28,7 @@ jobs:
 
     env:
       lambda_dir: external/scripts/commercetools-shipping-lambda
-      function_name: uat-commercetools-shipping-functions
+      function_name: commercetools-shipping-functions
       AWS_REGION: ${{ secrets.AWS_REGION }}
     
     steps:
