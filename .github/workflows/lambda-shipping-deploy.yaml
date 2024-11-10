@@ -15,7 +15,7 @@ on:
       - uat
       - prod
     paths:
-      - external/scripts/commercetools-algolia-daily-price-sync-aws-lambda/**
+      - external/scripts/commercetools-shipping-lambda/**
       - .github/**
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      lambda_dir: external/scripts/commercetools-algolia-daily-price-sync-aws-lambda
+      lambda_dir: external/scripts/commercetools-shipping-lambda
       function_name: commercetools-algolia-daily-price-sync
       AWS_REGION: ${{ secrets.AWS_REGION }}
     
