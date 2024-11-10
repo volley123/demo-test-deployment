@@ -7,7 +7,7 @@ on:
       - uat
       - prod
     tags:
-      - 'uat-*'  # Trigger only on tags with prefix 'uat-'
+      - 'uat-algolia-*'  # Trigger only on tags with prefix 'uat-'
 
   pull_request:
     branches:
