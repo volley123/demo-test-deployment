@@ -1,4 +1,4 @@
-name: CT Shipping Lambda
+name: CT Algolia Daily Price Sync Lambda
 
 on:
   push:
