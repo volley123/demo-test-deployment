@@ -8,7 +8,7 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
     return {
         statusCode: 200,
         body: JSON.stringify({
-            message: "Hello from Lambda functions with some update code series 1!",
+            message: "Hello from Lambda functions with some update code series 2!",
             event: event,
         }),
     };

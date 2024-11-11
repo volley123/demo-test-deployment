@@ -9,7 +9,7 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
     console.log("Event:", JSON.stringify(event, null, 2));
 
     // Example of added functionality in version 1.0.1
-    const responseMessage = "Version 2.0.1: Updated Lambda function code has lots of new features available";
+    const responseMessage = "Version 4.0.1: Updated Lambda function code has lots of new features available";
 
     return {
         statusCode: 200,
