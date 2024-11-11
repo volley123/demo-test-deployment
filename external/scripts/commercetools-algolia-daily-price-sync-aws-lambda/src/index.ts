@@ -11,6 +11,7 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
             message: "Hello from Lambda functions with some update code series 2!",
             event: event,
         }),
+        
     };
 };
 
