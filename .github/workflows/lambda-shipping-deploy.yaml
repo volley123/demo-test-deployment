@@ -1,4 +1,4 @@
-name: CT Algolia Shipping Lambda
+name: CT Shipping Lambda
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - uat
       - prod
     tags:
-      - 'uat-algolia-*'  # Trigger only on tags with prefix 'uat-'
+      - 'uat-shipping-*'  # Trigger only on tags with prefix 'uat-'
 
   pull_request:
     branches:
@@ -28,7 +28,7 @@ jobs:
 
     env:
       lambda_dir: external/scripts/commercetools-shipping-lambda
-      function_name: commercetools-algolia-daily-price-sync
+      function_name: commercetools-shipping-functions
       AWS_REGION: ${{ secrets.AWS_REGION }}
     
     steps:
@@ -58,4 +58,3 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           function_name: "uat-${{ env.function_name }}"
           zip_file: ${{ env.lambda_dir }}/build/deployment_package.zip
-
