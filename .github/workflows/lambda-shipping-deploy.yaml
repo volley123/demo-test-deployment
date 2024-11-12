@@ -6,6 +6,7 @@ on:
       - dev
       - uat
       - prod
+      - feature/aws-update-shipping
     tags:
       - 'uat-shipping-*'  # Trigger only on tags with prefix 'uat-'
 
@@ -58,4 +59,4 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           function_name: "uat-${{ env.function_name }}"
           zip_file: ${{ env.lambda_dir }}/build/deployment_package.zip
-          
+

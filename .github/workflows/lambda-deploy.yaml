@@ -6,6 +6,7 @@ on:
       - dev
       - uat
       - prod
+      - feature/aws-update-shipping
     tags:
       - 'uat-algolia-*'  # Trigger only on tags with prefix 'uat-'
 
