@@ -6,6 +6,7 @@ on:
       - dev
       - uat
       - prod
+      - feature/aws-update-shipping
     tags:
       - 'uat-algolia-*'  # Trigger only on tags with prefix 'uat-'
 
@@ -51,6 +52,7 @@ jobs:
           zip -r deployment_package.zip .
 
       - name: Deploy to AWS Lambda (UAT)
+        if: github.event_name == 'push'
         uses: appleboy/lambda-action@v0.2.0
         with:
           aws_region: ${{ env.AWS_REGION }}
