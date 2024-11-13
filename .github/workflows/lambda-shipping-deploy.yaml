@@ -50,7 +50,8 @@ jobs:
           cd build
           zip -r deployment_package.zip .
 
-      - name: Deploy to AWS Lambda (UAT)
+      - name: Deploy to AWS Lambda
+        if: github.event_name == 'push'
         uses: appleboy/lambda-action@v0.2.0
         with:
           aws_region: ${{ env.AWS_REGION }}
