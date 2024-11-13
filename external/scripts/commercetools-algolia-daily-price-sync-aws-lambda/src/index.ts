@@ -13,3 +13,4 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
         }),
     };
 };
+
