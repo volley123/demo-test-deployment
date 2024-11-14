@@ -6,9 +6,8 @@ on:
       - dev
       - uat
       - prod
-      - feature/aws-update-shipping
-    tags:
-      - 'uat-shipping-*'  # Trigger only on tags with prefix 'uat-'
+      # You can still include feature branches in `push` to enable CI checks, but deployments won’t run for them
+      - feature/*
 
   pull_request:
     branches:
@@ -21,9 +20,9 @@ on:
 
 jobs:
   build-and-deploy:
-    # Only run if the tag starts with 'uat-'
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/uat-')
-    environment: uat
+    # Only run if the branch is dev, uat, or prod
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/uat' || github.ref == 'refs/heads/prod'
+    environment: ${{ github.ref == 'refs/heads/uat' && 'uat' || github.ref == 'refs/heads/prod' && 'prod' || 'dev' }}
 
     runs-on: ubuntu-latest
 
@@ -44,19 +43,18 @@ jobs:
       - name: Build the Lambda function
         run: |
           cd ${{ env.lambda_dir }}
-          echo "Building function ${{ env.function_name }} for environment UAT"
+          echo "Building function ${{ env.function_name }} for environment ${{ github.ref }}"
           yarn install
           yarn build
           mkdir -p build
           cd build
           zip -r deployment_package.zip .
 
-      - name: Deploy to AWS Lambda (UAT)
+      - name: Deploy to AWS Lambda
         uses: appleboy/lambda-action@v0.2.0
         with:
           aws_region: ${{ env.AWS_REGION }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          function_name: "uat-${{ env.function_name }}"
+          function_name: "${{ github.ref == 'refs/heads/uat' && 'uat-' || github.ref == 'refs/heads/prod' && 'prod-' || 'dev-' }}${{ env.function_name }}"
           zip_file: ${{ env.lambda_dir }}/build/deployment_package.zip
-
