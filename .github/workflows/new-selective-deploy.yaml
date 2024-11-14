@@ -53,7 +53,7 @@ jobs:
             aws lambda update-function-code \
               --function-name "${{ github.event.inputs.environment }}-${lambda}" \
               --zip-file fileb://deployment_package.zip \
-              --region ${{ secrets.AWS_REGION }}
+              --region ap-south-1 
 
             # Cleanup the zip file and return to the root directory
             rm deployment_package.zip
