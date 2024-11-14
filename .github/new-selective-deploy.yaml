@@ -1,16 +1,6 @@
-name: Dynamic Selective Lambda Deployment
+name: Deploy Selected Lambdas
 
 on:
-  push:
-    branches:
-      - dev
-      - uat
-      - prod
-  pull_request:
-    branches:
-      - dev
-      - uat
-      - prod
   workflow_dispatch:
     inputs:
       environment:
@@ -18,8 +8,8 @@ on:
         required: true
         default: 'dev'
       lambda_functions:
-        description: 'Comma-separated list of specific Lambdas to deploy (leave empty to auto-detect changes)'
-        required: false
+        description: 'Comma-separated list of Lambdas to deploy (e.g., commercetools-algolia-daily-price-sync-aws-lambda, commercetools-shipping-lambda)'
+        required: true
 
 jobs:
   deploy_selected:
@@ -29,52 +19,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Detect Changed Lambda Directories
-        id: changes
-        run: |
-          # Define the base directory where all Lambdas are stored
-          base_dir="external/scripts"
-          changed_lambdas=""
-
-          # If specific Lambdas are listed in the inputs, use those
-          if [[ "${{ github.event.inputs.lambda_functions }}" ]]; then
-            changed_lambdas="${{ github.event.inputs.lambda_functions }}"
-          else
-            # Scan directories under the base path and check for changes in each Lambda
-            for lambda_dir in $(find "$base_dir" -mindepth 1 -maxdepth 1 -type d); do
-              if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "^$lambda_dir/"; then
-                # Extract Lambda name from the folder name
-                lambda_name=$(basename "$lambda_dir")
-                changed_lambdas="$changed_lambdas $lambda_name"
-              fi
-            done
-          fi
-
-          # Save the list of changed or specified Lambdas
-          echo "changed_lambdas=${changed_lambdas}" >> $GITHUB_ENV
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
       - name: Deploy Selected Lambdas
-        if: ${{ env.changed_lambdas }}
         run: |
-          for lambda in ${{ env.changed_lambdas }}; do
-            lambda_dir="external/scripts/${lambda}"
-
-            echo "Deploying $lambda from $lambda_dir"
-
-            # Navigate to the Lambda's directory
-            cd "$lambda_dir"
-
-            # Install dependencies and package the Lambda
+          # Loop through each lambda function provided in the input
+          for lambda in $(echo "${{ github.event.inputs.lambda_functions }}" | tr ',' ' '); do
+            echo "Deploying $lambda to ${{ github.event.inputs.environment }} environment"
+            
+            # Change to the specific Lambda function directory
+            cd external/scripts/$lambda
+            
+            # Install dependencies and package the Lambda function
             npm install
-            zip -r ${lambda}.zip .
-
-            # Deploy to AWS Lambda with environment-based naming convention
+            zip -r ../${lambda}.zip .
+            
+            # Deploy the Lambda function to the selected environment
             aws lambda update-function-code \
-              --function-name "${lambda}-${{ github.event.inputs.environment }}" \
-              --zip-file fileb://${lambda}.zip
-
-            # Go back to the base directory
-            cd -
+              --function-name "my-${lambda}-${{ github.event.inputs.environment }}" \
+              --zip-file fileb://../${lambda}.zip
+            
+            # Cleanup the zip file and return to the root directory
+            rm ../${lambda}.zip
+            cd ../../..
           done
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
