@@ -1,4 +1,4 @@
-name: Deploy Selected Lambdas
+name: Deploy Selected Lambdas Latest
 
 on:
   workflow_dispatch:
