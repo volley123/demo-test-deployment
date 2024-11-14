@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Select environment to deploy to (dev, uat, prod)'
+        description: 'Select environment to deploy to particualr branch (dev, uat, prod)'
         required: true
         default: 'dev'
       lambda_functions:
