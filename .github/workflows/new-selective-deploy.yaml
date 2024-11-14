@@ -24,6 +24,9 @@ jobs:
         with:
           node-version: 18.x
 
+      - name: Check AWS CLI version
+        run: aws --version  # Verify AWS CLI is installed and working  
+
       - name: Deploy Selected Lambdas
         run: |
           # Loop through each lambda function provided in the input
@@ -53,7 +56,7 @@ jobs:
             aws lambda update-function-code \
               --function-name "${{ github.event.inputs.environment }}-${lambda}" \
               --zip-file fileb://deployment_package.zip \
-              --region ${{ secrets.AWS_REGION }}
+              --region ap-south-1 
 
             # Cleanup the zip file and return to the root directory
             rm deployment_package.zip
