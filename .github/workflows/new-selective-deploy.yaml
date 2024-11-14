@@ -34,7 +34,7 @@ jobs:
             echo "Deploying $lambda to ${{ github.event.inputs.environment }} environment"
 
             # Set the appropriate Lambda directory
-            lambda_dir="external/scripts/*"
+            lambda_dir="external/scripts/$lambda"
 
             # Check if the directory exists before proceeding
             if [ ! -d "$lambda_dir" ]; then
