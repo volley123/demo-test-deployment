@@ -24,6 +24,9 @@ jobs:
         with:
           node-version: 18.x
 
+      - name: Check AWS CLI version
+        run: aws --version  # Check if AWS CLI is installed and working    
+
       - name: Deploy Selected Lambdas
         run: |
           # Loop through each lambda function provided in the input
