@@ -59,4 +59,3 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           function_name: "uat-${{ env.function_name }}"
           zip_file: ${{ env.lambda_dir }}/build/deployment_package.zip
-
