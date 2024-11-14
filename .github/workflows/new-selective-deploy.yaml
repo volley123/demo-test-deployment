@@ -17,36 +17,49 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      - name: Set up Node.js 18.x
+        uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: 18.x
 
       - name: Deploy Selected Lambdas
         run: |
           # Loop through each lambda function provided in the input
           for lambda in $(echo "${{ github.event.inputs.lambda_functions }}" | tr ',' ' '); do
             echo "Deploying $lambda to ${{ github.event.inputs.environment }} environment"
-            
-            # Change to the specific Lambda function directory
-            cd external/scripts/$lambda
-            
-            # Install dependencies and package the Lambda function
-            npm install
-            zip -r ../${lambda}.zip .
-            
-            # Deploy the Lambda function to the selected environment
+
+            # Set the appropriate Lambda directory
+            lambda_dir="external/scripts/$lambda"
+
+            # Check if the directory exists before proceeding
+            if [ ! -d "$lambda_dir" ]; then
+              echo "Lambda function directory $lambda_dir does not exist, skipping..."
+              continue
+            fi
+
+            # Build the Lambda function
+            echo "Building function $lambda for environment ${{ github.event.inputs.environment }}"
+            cd $lambda_dir
+            yarn install
+            yarn build
+            mkdir -p build
+            cd build
+            zip -r deployment_package.zip .
+
+            # Deploy to AWS Lambda
+            echo "Deploying $lambda to AWS Lambda in the ${{ github.event.inputs.environment }} environment"
             aws lambda update-function-code \
-              --function-name "my-${lambda}-${{ github.event.inputs.environment }}" \
-              --zip-file fileb://../${lambda}.zip
-            
+              --function-name "${{ github.event.inputs.environment }}-${lambda}" \
+              --zip-file fileb://deployment_package.zip \
+              --region ${{ secrets.AWS_REGION }}
+
             # Cleanup the zip file and return to the root directory
-            rm ../${lambda}.zip
+            rm deployment_package.zip
             cd ../../..
           done
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'us-east-1'
+          AWS_REGION: ${{ secrets.AWS_REGION }}
