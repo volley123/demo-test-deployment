@@ -1,0 +1,52 @@
+name: Deploy Selected Lambdas
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select environment to deploy to (dev, uat, prod)'
+        required: true
+        default: 'dev'
+      lambda_functions:
+        description: 'Comma-separated list of Lambdas to deploy (e.g., commercetools-algolia-daily-price-sync-aws-lambda, commercetools-shipping-lambda)'
+        required: true
+
+jobs:
+  deploy_selected:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Deploy Selected Lambdas
+        run: |
+          # Loop through each lambda function provided in the input
+          for lambda in $(echo "${{ github.event.inputs.lambda_functions }}" | tr ',' ' '); do
+            echo "Deploying $lambda to ${{ github.event.inputs.environment }} environment"
+            
+            # Change to the specific Lambda function directory
+            cd external/scripts/$lambda
+            
+            # Install dependencies and package the Lambda function
+            npm install
+            zip -r ../${lambda}.zip .
+            
+            # Deploy the Lambda function to the selected environment
+            aws lambda update-function-code \
+              --function-name "my-${lambda}-${{ github.event.inputs.environment }}" \
+              --zip-file fileb://../${lambda}.zip
+            
+            # Cleanup the zip file and return to the root directory
+            rm ../${lambda}.zip
+            cd ../../..
+          done
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
